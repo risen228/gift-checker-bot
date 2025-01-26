@@ -19,7 +19,7 @@ jobs:
       - name: Check star_count > 499 in gifts
         id: check-star-count
         run: |
-          echo "$GIFT_DATA" | jq -e '.result.gifts[] | select(.star_count > 499)' > /dev/null && echo "found=true" || echo "found=false"
+          echo "$GIFT_DATA" | jq -e '.result.gifts[] | select(.star_count > 499)' > /dev/null && echo "found=true" >> $GITHUB_OUTPUT || echo "found=false" >> $GITHUB_OUTPUT
         env:
           GIFT_DATA: ${{ steps.available-gifts.outputs.response }}
 
