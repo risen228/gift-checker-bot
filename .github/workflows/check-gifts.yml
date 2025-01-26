@@ -1,0 +1,31 @@
+name: Check gifts
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" 
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get available gifts
+        uses: fjogeleit/http-request-action@v1
+        id: available-gifts
+        with:
+          url: 'https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/getAvailableGifts'
+          method: 'GET'
+
+      - name: Check star_count > 500 in gifts
+        id: check-star-count
+        run: |
+          echo "$GIFT_DATA" | jq -e '.result.gifts[] | select(.star_count > 500)' > /dev/null && echo "found=true" || echo "found=false"
+        env:
+          GIFT_DATA: ${{ steps.available-gifts.outputs.response }}
+
+      - name: Send message if gift found
+        if: steps.check-star-count.outputs.found == 'true'
+        run: |
+          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d '{"chat_id": "${{ secrets.TELEGRAM_USER_ID }}", "text": "Gift detected!"}'
