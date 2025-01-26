@@ -16,10 +16,10 @@ jobs:
           url: 'https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/getAvailableGifts'
           method: 'GET'
 
-      - name: Check star_count > 499 in gifts
+      - name: Check star_count > 500 in gifts
         id: check-star-count
         run: |
-          echo "$GIFT_DATA" | jq -e '.result.gifts[] | select(.star_count > 499)' > /dev/null && echo "found=true" >> $GITHUB_OUTPUT || echo "found=false" >> $GITHUB_OUTPUT
+          echo "$GIFT_DATA" | jq -e '.result.gifts[] | select(.star_count > 500)' > /dev/null && echo "found=true" >> $GITHUB_OUTPUT || echo "found=false" >> $GITHUB_OUTPUT
         env:
           GIFT_DATA: ${{ steps.available-gifts.outputs.response }}
 
